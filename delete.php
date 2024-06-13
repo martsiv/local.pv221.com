@@ -1,18 +1,7 @@
 <?php
-// Database credentials
-$config = require 'config.php';
-
-$host = $config['db_host'];
-$dbname = $config['db_name'];
-$username = $config['db_user'];
-$password = $config['db_pass'];
-
-// Connection string
-$dsn = "mysql:host=$host;dbname=$dbname";
-$options = [];
+include "connection_database.php";
 
 try {
-    $pdo = new PDO($dsn, $username, $password, $options);
     // Checking if the $user_id parameter is passed
     if (!empty($_GET['user_id'])) {
         $user_id = intval($_GET['user_id']);

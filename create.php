@@ -1,3 +1,26 @@
+<?php
+if($_SERVER["REQUEST_METHOD"]=="POST") {
+    include_once $_SERVER["DOCUMENT_ROOT"]."/connection_database.php";
+    $folderName = $_SERVER['DOCUMENT_ROOT'].'/'. UPLOADS; // Set folders name for images
+    if (!file_exists($folderName)) {
+        mkdir($folderName, 0777); // Створити папку з правами доступу 0777
+    }
+    $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+    $fileName = uniqid() . '.' .$ext;
+    $uploadfile = $folderName ."/". $fileName;
+    move_uploaded_file($_FILES['image']['tmp_name'], $uploadfile);
+    $name =  $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $sql = 'INSERT INTO tbl_users (name, email, phone, image) VALUES (:name, :email, :phone, :image)';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['name' => $name, 'email' => $email, 'phone' => $phone, 'image' => $fileName]);
+
+    header('Location: /');
+    exit();
+}
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -19,25 +42,37 @@
 </div>
     <main>
         <div class="container">
-            <h2 class="my-4">Create New User</h2>
-            <form action="create_user.php" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="name">Name:</label>
+            <h1 class="text-center">Create New User</h1>
+            <form class="col-md-6 offset-md-3" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
                     <input type="text" class="form-control" id="name" name="name" required>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
-                <div class="form-group">
-                    <label for="phone">Phone:</label>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone:</label>
                     <input type="text" class="form-control" id="phone" name="phone" required>
                 </div>
-                <div class="form-group">
-                    <label for="image">Profile Image:</label>
-                    <input type="file" class="form-control" id="image" name="image" required>
+                <div class="mb-3">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-md-3">
+                            <label for="image" class="form-label">
+                                <img src="/images/no-photo.jpg" alt="фото" width="100%">
+                            </label>
+                        </div>
+                        <div class="mb-3 col-md-9">
+                            <input type="file" class="form-control" id="image" name="image" aria-describedby="emailHelp">
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Create User</button>
+
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success me-2">Create</button>
+                    <a href="/" class="btn btn-primary">Cancel</a>
+                </div>
             </form>
         </div>
     </main>

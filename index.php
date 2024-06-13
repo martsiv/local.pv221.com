@@ -1,28 +1,5 @@
 <?php
-// Database credentials
-$config = require 'config.php';
-
-$host = $config['db_host'];
-$dbname = $config['db_name'];
-$username = $config['db_user'];
-$password = $config['db_pass'];
-
-// Connection string
-$dsn = "mysql:host=$host;dbname=$dbname";
-
-// Attempt to connect
-try {
-    $pdo = new PDO($dsn, $username, $password);
-    // Set PDO to throw exceptions on errors
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-}
-function deteleRecord($id, $pdo){
-    // sql to delete a record
-    $sql = "DELETE FROM tbl_users WHERE id=$id";
-    $pdo->query($sql);
-}
+include $_SERVER['DOCUMENT_ROOT'] . '/connection_database.php';
 ?>
 
 <!doctype html>
@@ -67,7 +44,7 @@ function deteleRecord($id, $pdo){
                 $name = $row['name'];
                 $email = $row['email'];
                 $phone = $row['phone'];
-                $image = $row['image'];
+                $image = "/".UPLOADS."/".$row['image'];
                 echo "
             <tr>
                 <th scope='row'>$id</th>
