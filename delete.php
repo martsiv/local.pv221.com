@@ -1,28 +1,35 @@
 <?php
-include "connection_database.php";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'])) {
+    $user_id = intval($_POST['user_id']);
 
-try {
-    // Checking if the $user_id parameter is passed
-    if (!empty($_GET['user_id'])) {
-        $user_id = intval($_GET['user_id']);
+    include_once $_SERVER["DOCUMENT_ROOT"]."/connection_database.php";
 
-        // Checking if the user has confirmed the deletion
-        if (!empty($_GET['confirm'])) {
-            // Deleting a record from the database
-            $sql = "DELETE FROM tbl_users WHERE id=$user_id";
-            $pdo->query($sql);
-            echo "Record deleted successfully!";
-            header('Location: '."/index.php");
-            die();
-        } else {
-            // Deletion confirmation output
-            echo "Are you sure you want to delete this entry??<br>";
-            echo "<a href='delete.php?user_id=$user_id&confirm=1'>Yes</a> - ";
-            echo "<a href='index.php'>No</a>";
+    // Отримуємо ім'я файлу зображення, яке потрібно видалити
+    $sql_select_image = "SELECT image FROM tbl_users WHERE id=:id";
+    $stmt_select_image = $pdo->prepare($sql_select_image);
+    $stmt_select_image->execute(['id' => $user_id]);
+    $image_row = $stmt_select_image->fetch(PDO::FETCH_ASSOC);
+
+    if ($image_row) {
+        $image_filename = $image_row['image'];
+
+        // Видаляємо зображення з сервера
+        $image_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $image_filename;
+        if (file_exists($image_path)) {
+            unlink($image_path);
         }
-    } else {
-        echo "Incorrect incoming parameter user_id.";
     }
-} catch (PDOException $e) {
-    die('Connection failed: ' . $e->getMessage());
+
+    // Видаляємо запис користувача з бази даних
+    $sql_delete_user = "DELETE FROM tbl_users WHERE id=:id";
+    $stmt_delete_user = $pdo->prepare($sql_delete_user);
+    $stmt_delete_user->execute(['id' => $user_id]);
+
+    if ($stmt_delete_user->rowCount() > 0) {
+        echo "Record and image deleted successfully!";
+    } else {
+        echo "Error deleting record.";
+    }
+    exit();
 }
+?>

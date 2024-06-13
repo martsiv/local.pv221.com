@@ -57,7 +57,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/connection_database.php';
                 <td>$phone</td>
                 <td>$email</td>
                 <td>
-                    <a href='delete.php?user_id=$id'>Delete</a>
+                    <a href='' class=delete-link data-user-id=$id>Delete</a>
                 </td>
 
             </tr>
@@ -69,6 +69,52 @@ include $_SERVER['DOCUMENT_ROOT'] . '/connection_database.php';
     </div>
 </main>
 
-<script src="/js/bootstrap.bundle.min.js"></script>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this user?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var deleteUserId;
+
+            document.querySelectorAll('.delete-link').forEach(function(link) {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    deleteUserId = this.getAttribute('data-user-id');
+                    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                    deleteModal.show();
+                });
+            });
+
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'delete.php', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        location.reload(); // Reload the page after successful deletion
+                    }
+                };
+                xhr.send('user_id=' + deleteUserId);
+            });
+        });
+    </script>
+
 </body>
-</html><?php
+</html>

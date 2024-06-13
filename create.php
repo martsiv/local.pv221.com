@@ -191,5 +191,28 @@ if($_SERVER["REQUEST_METHOD"]=="POST") {
             })
     })()
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('image');
+        var preview = document.querySelector('img');
+
+        input.addEventListener('change', function() {
+            var file = input.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '/images/no-photo.jpg'; // Show default image if file not choosed
+            }
+        });
+    });
+</script>
+
 </body>
 </html><?php
