@@ -89,6 +89,8 @@ include $_SERVER['DOCUMENT_ROOT'] . '/connection_database.php';
     </div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/axios.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var deleteUserId;
@@ -103,15 +105,19 @@ include $_SERVER['DOCUMENT_ROOT'] . '/connection_database.php';
             });
 
             document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'delete.php', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        location.reload(); // Reload the page after successful deletion
-                    }
-                };
-                xhr.send('user_id=' + deleteUserId);
+                // Create new object FormData
+                var formData = new FormData();
+
+                // Add data to formData
+                formData.append('user_id', deleteUserId);
+                axios.post("/delete.php", formData)
+                    .then(resp => {
+                        console.log("Deleting success");
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting:', error);
+                    });
             });
         });
     </script>
